@@ -21,45 +21,52 @@ k8s-flask-app/
 - kubectl
 - Python 3.11+
 
-## Setup Instructions
+## Quick Start Guide
 
-1. Start Minikube:
+### 1. Start Minikube
 ```bash
 minikube start
 ```
 
-2. Enable required addons:
+### 2. Enable Required Addons
 ```bash
 minikube addons enable ingress
 ```
 
-3. Build the Docker image:
+### 3. Build Docker Image
 ```bash
 eval $(minikube docker-env)
 docker build -t flask-app:latest ./app/
 ```
 
-4. Apply Kubernetes manifests:
+### 4. Deploy Application
+Apply the Kubernetes manifests in the correct order:
+
 ```bash
+# Create secrets and configmaps
 kubectl apply -f manifests/secret/postgres-secret.yaml
 kubectl apply -f manifests/configmap/postgres-configmap.yaml
+
+# Create persistent volume and deployment
 kubectl apply -f manifests/deployment/postgres-pv.yaml
 kubectl apply -f manifests/deployment/postgres-deployment.yaml
+
+# Create services
 kubectl apply -f manifests/service/postgres-service.yaml
 kubectl apply -f manifests/deployment/flask-deployment.yaml
 kubectl apply -f manifests/service/flask-service.yaml
 ```
 
-## Accessing the Application
+### 5. Verify Deployment
+```bash
+kubectl get all
+```
 
+### 6. Access the Application
 Get the service URL:
 ```bash
 minikube service flask-service --url
 ```
-
-The application will be available at the provided URL.
-
-## Health Check
 
 Test the application health:
 ```bash
@@ -91,6 +98,7 @@ kubectl logs -l app=postgres
 To clean up the deployment:
 ```bash
 kubectl delete -f manifests/
+minikube stop
 ```
 
 ## Documentation
